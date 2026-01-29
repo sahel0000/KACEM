@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday to a Queen!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #ff85a2; /* Rose Gold/Pink */
+            --secondary: #fce4ec;
+            --accent: #ffd700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #fff5f7;
+            background: linear-gradient(135deg, #fff5f7 0%, #fce4ec 100%);
+            color: #4a4a4a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(255, 133, 162, 0.2);
+            max-width: 550px;
+            width: 90%;
+            border: 1px solid rgba(255, 133, 162, 0.3);
+            position: relative;
+        }
+
+        /* Profile Image Styles */
+        .profile-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .profile {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            padding: 5px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(255, 133, 162, 0.3);
+        }
+
+        .crown {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 45px;
+            filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: #d81b60;
+            margin-bottom: 10px;
+        }
+
+        .subtext {
+            font-style: italic;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        /* Elegant Button */
+        .btn-mom {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #ff85a2, #ff4081);
+            color: white;
+            box-shadow: 0 8px 20px rgba(255, 64, 129, 0.3);
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-mom:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(255, 64, 129, 0.4);
+        }
+
+        /* Surprise Cards */
+        .cards {
+            margin-top: 35px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--secondary);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #d81b60;
+            font-weight: bold;
+            border: 1px solid transparent;
+        }
+
+        .card:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        /* Popup Styles */
+        .popup {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(216, 27, 96, 0.1);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup-content {
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            max-width: 400px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+        }
+
+        #wishArea {
+            display: none;
+            margin-top: 25px;
+            font-size: 1.3rem;
+            color: #ad1457;
+            animation: fadeIn 1s;
+        }
+
+        @keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="profile-container">
+        <span class="crown">👑</span>
+        <img src="image.png" alt="Mom" class="profile">
+    </div>
+
+    <h1>Happy Birthday, Ommi!</h1>
+    <p class="subtext">To the woman who gave Kacem everything. ❤️</p>
+
+    <button class="btn-mom" id="celebrateBtn">Press for a Blessing ✨</button>
+
+    <div id="wishArea">💖 You are the heart of our home 💖</div>
+
+    <div class="cards">
+        <div class="card" onclick="openGift('🌸 You are the most beautiful flower')">Health</div>
+        <div class="card" onclick="openGift('🏠 The light of our house')">Happiness</div>
+        <div class="card" onclick="openGift('🤲 May Allah protect you always')">Blessing</div>
+        <div class="card" onclick="openGift('👵 May you live 100 happy years')">Longevity</div>
+    </div>
+</div>
+
+<div class="popup" id="popup">
+    <div class="popup-content">
+        <h2 id="popupText" style="color: #d81b60;"></h2>
+        <br>
+        <button class="btn-mom" onclick="closePopup()">I Love You Mom</button>
+    </div>
+</div>
+
+<script>
+    const celebrateBtn = document.getElementById('celebrateBtn');
+    const wishArea = document.getElementById('wishArea');
+
+    celebrateBtn.addEventListener('click', () => {
+        // Multi-color Confetti
+        var duration = 3 * 1000;
+        var end = Date.now() + duration;
+
+        (function frame() {
+            confetti({
+                particleCount: 3,
+                angle: 60,
+                spread: 55,
+                origin: { x: 0 },
+                colors: ['#ff85a2', '#ff4081', '#ffd700']
+            });
+            confetti({
+                particleCount: 3,
+                angle: 120,
+                spread: 55,
+                origin: { x: 1 },
+                colors: ['#ff85a2', '#ff4081', '#ffd700']
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        }());
+
+        wishArea.style.display = 'block';
+        celebrateBtn.innerText = "WE LOVE YOU! ❤️";
+    });
+
+    function openGift(message) {
+        document.getElementById('popupText').innerText = message;
+        document.getElementById('popup').style.display = 'flex';
+        
+        confetti({
+            particleCount: 50,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#ff4081']
+        });
+    }
+
+    function closePopup() {
+        document.getElementById('popup').style.display = 'none';
+    }
+</script>
+
+</body>
+</html>
